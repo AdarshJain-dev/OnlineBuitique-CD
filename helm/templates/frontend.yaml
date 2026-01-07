@@ -6,6 +6,8 @@ metadata:
   labels:
     app: frontend
     {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    sidecar.istio.io/rewriteAppHTTPProbers: "true"
 spec:
   selector:
     matchLabels:
