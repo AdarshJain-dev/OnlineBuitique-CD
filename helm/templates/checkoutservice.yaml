@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkoutservice
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: checkoutservice
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: checkoutservice
+  template:
+    metadata:
+      labels:
+        app: checkoutservice
+    spec:
+      containers:
+        - name: server
+          image: "{{ .Values.checkoutservice.image }}:{{ .Values.checkoutservice.tag }}"
+          ports:
+            - containerPort: 5050
+          env:
+{{- range $k, $v := .Values.checkoutservice.env }}
+            - name: {{ $k }}
+              value: "{{ $v }}"
+{{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkoutservice
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: checkoutservice
+  ports:
+    - port: 5050
+      targetPort: 5050

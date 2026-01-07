@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cartservice
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: cartservice
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: cartservice
+  template:
+    metadata:
+      labels:
+        app: cartservice
+    spec:
+      containers:
+        - name: server
+          image: "{{ .Values.cartservice.image }}:{{ .Values.cartservice.tag }}"
+          ports:
+            - containerPort: 7070
+          env:
+{{- range $k, $v := .Values.cartservice.env }}
+            - name: {{ $k }}
+              value: "{{ $v }}"
+{{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cartservice
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: cartservice
+  ports:
+    - port: 7070
+      targetPort: 7070

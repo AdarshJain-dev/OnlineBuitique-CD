@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendationservice
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: recommendationservice
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: recommendationservice
+  template:
+    metadata:
+      labels:
+        app: recommendationservice
+    spec:
+      containers:
+        - name: server
+          image: "{{ .Values.recommendationservice.image }}:{{ .Values.recommendationservice.tag }}"
+          ports:
+            - containerPort: 8080
+          env:
+{{- range $k, $v := .Values.recommendationservice.env }}
+            - name: {{ $k }}
+              value: "{{ $v }}"
+{{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommendationservice
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: recommendationservice
+  ports:
+    - port: 8080
+      targetPort: 8080

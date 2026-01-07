@@ -1,0 +1,104 @@
+# online-boutique/values.yaml
+namespace: ecom
+
+# global defaults
+replicaCount: 2
+imagePullPolicy: IfNotPresent
+
+emailservice:
+  image: adarshjain428/emailservice
+  tag: "5"
+  port: 8080
+  servicePort: 5000
+  replicaCount: 1
+
+checkoutservice:
+  image: adarshjain428/checkoutservice
+  tag: "5"
+  port: 5050
+  replicaCount: 1
+  env:
+    PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+    SHIPPING_SERVICE_ADDR: shippingservice:50051
+    PAYMENT_SERVICE_ADDR: paymentservice:50051
+    EMAIL_SERVICE_ADDR: emailservice:5000
+    CURRENCY_SERVICE_ADDR: currencyservice:7000
+    CART_SERVICE_ADDR: cartservice:7070
+
+recommendationservice:
+  image: adarshjain428/recommendationservice
+  tag: "5"
+  port: 8080
+  replicaCount: 1
+  env:
+    PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+
+frontend:
+  image: adarshjain428/frontend
+  tag: "7"
+  port: 8080
+  servicePort: 80
+  replicaCount: 2
+
+paymentservice:
+  image: adarshjain428/paymentservice
+  tag: "5"
+  port: 50051
+  replicaCount: 1
+
+productcatalogservice:
+  image: adarshjain428/productcatalogservice
+  tag: "5"
+  port: 3550
+  replicaCount: 1
+
+cartservice:
+  image: adarshjain428/cartservice
+  tag: "5"
+  port: 7070
+  replicaCount: 1
+  env:
+    REDIS_ADDR: redis-cart:6379
+
+currencyservice:
+  image: adarshjain428/currencyservice
+  tag: "5"
+  port: 7000
+  replicaCount: 1
+
+shippingservice:
+  image: adarshjain428/shippingservice
+  tag: "5"
+  port: 50051
+  replicaCount: 1
+
+adservice:
+  image: adarshjain428/adservice
+  tag: "5"
+  port: 9555
+  replicaCount: 1
+
+redis:
+  image: redis:alpine
+  port: 6379
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 70m
+      memory: 200Mi
+    limits:
+      cpu: 125m
+      memory: 256Mi
+
+loadgenerator:
+  image: adarshjain428/loadgenerator
+  tag: "5"
+  users: 10
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 300m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
