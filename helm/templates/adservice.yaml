@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: adservice
+  namespace: {{ .Values.namespace }}
   labels:
     app: adservice
-    app.kubernetes.io/name: {{ .Chart.Name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "app.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
@@ -15,30 +15,11 @@ spec:
       labels:
         app: adservice
     spec:
-      serviceAccountName: default
-      terminationGracePeriodSeconds: 5
       containers:
         - name: server
           image: "{{ .Values.adservice.image }}:{{ .Values.adservice.tag }}"
-          imagePullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
           ports:
-            - containerPort: {{ .Values.adservice.port }}
-          env:
-            - name: PORT
-              value: "{{ .Values.adservice.port }}"
-          resources:
-            requests:
-              cpu: 200m
-              memory: 180Mi
-            limits:
-              cpu: 300m
-              memory: 300Mi
-          readinessProbe:
-            exec:
-              command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.adservice.port }}"]
-          livenessProbe:
-            exec:
-              command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.adservice.port }}"]
+            - containerPort: 9555
 ---
 apiVersion: v1
 kind: Service
@@ -50,6 +31,5 @@ spec:
   selector:
     app: adservice
   ports:
-    - name: grpc
-      port: {{ .Values.adservice.port }}
-      targetPort: {{ .Values.adservice.port }}
+    - port: 9555
+      targetPort: 9555
