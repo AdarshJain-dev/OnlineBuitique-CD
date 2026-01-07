@@ -35,7 +35,7 @@ recommendationservice:
 
 frontend:
   image: adarshjain428/frontend
-  tag: "7"
+  tag: "9"
   port: 8080
   servicePort: 80
   replicaCount: 2
