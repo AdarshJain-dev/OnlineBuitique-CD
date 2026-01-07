@@ -4,7 +4,7 @@ metadata:
   name: online-boutique
   namespace: argocd
 spec:
-  project: default
+  project: OB
 
   source:
     repoURL: https://github.com/AdarshJain-dev/OnlineBuitique-CD.git
