@@ -16,11 +16,30 @@ spec:
       labels:
         app: adservice
     spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
       containers:
         - name: server
           image: "{{ .Values.adservice.image }}:{{ .Values.adservice.tag }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
           ports:
-            - containerPort: 9555
+            - containerPort: {{ .Values.adservice.port }}
+          env:
+            - name: PORT
+              value: "{{ .Values.adservice.port }}"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 180Mi
+            limits:
+              cpu: 300m
+              memory: 300Mi
+          readinessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.adservice.port }}"]
+          livenessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.adservice.port }}"]
 ---
 apiVersion: v1
 kind: Service
@@ -32,5 +51,6 @@ spec:
   selector:
     app: adservice
   ports:
-    - port: 9555
-      targetPort: 9555
+    - name: grpc
+      port: {{ .Values.adservice.port }}
+      targetPort: {{ .Values.adservice.port }}
