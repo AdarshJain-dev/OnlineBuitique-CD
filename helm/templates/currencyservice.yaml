@@ -24,6 +24,8 @@ spec:
           env:
             - name: PORT
               value: "{{ .Values.currencyservice.port }}"
+            - name: DISABLE_PROFILER
+              value: "1"
           readinessProbe:
             tcpSocket:
               port: {{ .Values.currencyservice.port }}
